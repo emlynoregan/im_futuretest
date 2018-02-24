@@ -1,0 +1,7 @@
+im_util >= 0.1.4
+im_future >= 0.1.1
+im_debouncedtask
+
+im_task_flask
+flask
+werkzeug==0.12.2
