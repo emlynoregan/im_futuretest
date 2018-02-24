@@ -1,6 +1,8 @@
 # im_futuretest
 This package provides a pre-packaged UI for running tests based on @futures, in Google App Engine, Python standard environment projects.
   
+[![Build Status](https://travis-ci.org/emlynoregan/im_futuretest.svg?branch=master)](https://travis-ci.org/emlynoregan/im_futuretest)
+
 ## Install 
 
 Use the python package for this library. You can find the package online [here](https://pypi.org/project/im-futuretest/).
