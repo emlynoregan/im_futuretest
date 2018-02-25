@@ -8,13 +8,14 @@ except ImportError:
 
 dist = setup(
     name='im_futuretest',
-    version='0.1.2',
+    version='0.1.3',
     description='This package provides a pre-packaged UI for running tests based on @futures, in Google App Engine, Python standard environment projects.',
     author='Emlyn O\'Regan',
     author_email='emlynoregan@gmail.com',
     url='https://github.com/emlynoregan/im_futuretest',
     license='../LICENSE.txt',
     packages=['im_futuretest'],
+    include_package_data=True,
     install_requires=['im_util >= 0.1.4', 'im_future >= 0.1.1', 'im_debouncedtask'],
     long_description=open('../README.md').read(),
     classifiers=[
