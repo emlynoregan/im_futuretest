@@ -19,7 +19,7 @@ var Tests = Vue.component('tests', {
   },
   created: function () {
 	  this.getTests()
-	  this.$emit("title", "Search Tests");
+	  this.$emit("title", "Search");
   },
   computed: {
 	tests: function() 
