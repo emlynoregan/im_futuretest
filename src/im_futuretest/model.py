@@ -122,12 +122,12 @@ class TestRun(ndb.model.Model):
             "id": self.key.id(),
             "testname": self.testname,
             "stored": datetime_to_unixtimestampusec(self.stored) if not self.stored is None else None,
-            "stored_desc": self.stored,
+            "stored_desc": str(self.stored),
             "updated": datetime_to_unixtimestampusec(self.updated) if not self.updated is None else None,
-            "updated_desc": self.updated,
+            "updated_desc": str(self.updated),
             "status": lstatus,
             "started": datetime_to_unixtimestampusec(self.started),
-            "started_desc": self.started,
+            "started_desc": str(self.started),
             "progress": self.progress,
             "futurekey": self.futurekey.urlsafe() if self.futurekey else None
         }

@@ -3,13 +3,13 @@ import logging
 from flask import Flask, redirect
 from im_futuretest import register_test 
 from im_task_flask import setuptasksforflask
-from flaskhandlers import register_tests_api, _create_route
+from im_futuretest_flask import register_futuretest_handlers, _create_route
 from im_task import PermanentTaskFailure, task
 from im_future import GetFutureAndCheckReady, FutureReadyForResult
 import time
 app = Flask(__name__)
 
-register_tests_api(app)
+register_futuretest_handlers(app)
 setuptasksforflask(app)
 
 @app.route("/", methods=["GET"])
