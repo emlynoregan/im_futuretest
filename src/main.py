@@ -20,34 +20,6 @@ def root():
     print "Here!" 
     return redirect(_create_route("ui/"), 301)
 
-@app.route(_create_route("future"), methods=["GET"])
-def future_api():
-    lfutureKeyUrlSafe = request.args.get('futurekey')
-    lincludeChildren = request.args.get('include_children')
-
-    logging.info("lfutureKeyUrlSafe=%s" % lfutureKeyUrlSafe)
-    logging.info("lincludeChildren=%s" % lincludeChildren)
-    
-    lfutureKey = ndb.Key(urlsafe = lfutureKeyUrlSafe)
-    
-    lfuture = lfutureKey.get()
-    
-    def keymap(future, level):
-        return future.key.urlsafe()
-            
-    lfutureJson = lfuture.to_dict(maxlevel=2 if lincludeChildren else 1, futuremapf = keymap) if lfuture else None
-    
-    if lfutureJson:
-        lfutureJson["futurekey"] = lfutureJson["key"]
-        del lfutureJson["key"]
-
-        lchildren = lfutureJson.get("zchildren") or [];
-        for lchild in lchildren:
-            lchild["futurekey"] = lchild["key"]
-            del lchild["key"]
-        
-    return jsonify(lfutureJson)
-
 @app.errorhandler(500)
 def server_error(e):
     # Log the error and stacktrace.
