@@ -6,7 +6,7 @@ var Future = Vue.component('future', {
 	    <div style="width:100%">
 	      <div style="width:100%">
 			<div style="width:100%" class="md-layout md-gutter">
-		  		<div class="md-layout-item md-size-10">
+		  		<div class="md-layout-item md-size-5">
 				    <div v-if="fut && fut.expanded" @click="do_contract">
 			  			<md-icon>arrow_drop_up</md-icon>
 			  		</div>
@@ -14,12 +14,12 @@ var Future = Vue.component('future', {
 			  			<md-icon>arrow_drop_down</md-icon>
 			  		</div>
 			  	</div>
-		  		<div class="md-layout-item md-size-10">
+		  		<div class="md-layout-item md-size-5">
 				    <div>
 			  			<md-icon :class="iconclass">{{icon}}</md-icon>
 			  		</div>
 			  	</div>
-			    <div class="md-layout-item md-size-80">
+			    <div class="md-layout-item md-size-90">
 				    <span v-if="fut" class="md-list-item-text">
 					  <a @click="navtofuture">
 					    <span v-if="fut.name">{{fut.id}} ({{fut.name}})</span>
