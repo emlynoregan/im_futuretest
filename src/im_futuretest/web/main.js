@@ -1,6 +1,7 @@
 const routes = [
   { path: '/', component: Tests },
-  { path: '/test/:testname', component: Test, props: true }
+  { path: '/test/:testname', component: Test, props: true },
+  { path: '/future/:futurekey', component: FutureTop, props: true }
 ]
 
 const router = new VueRouter({
@@ -14,12 +15,14 @@ const store = new Vuex.Store({
   state: {
     runids_by_test: {},
 	runs_by_id: {},
-    cursors_by_test: {}
+    cursors_by_test: {},
+    futures: {}
   },
   getters: {
     runids_by_test: state => { return state.runids_by_test; },
     runs_by_id: state => { return state.runs_by_id; },
-    cursors_by_test: state => { return state.cursors_by_test; }
+    cursors_by_test: state => { return state.cursors_by_test; },
+    futures: state => { return state.futures; }
   },
   mutations: {
     load_runids: function(state, payload)
@@ -68,20 +71,49 @@ const store = new Vuex.Store({
 			);
     	}
     },
-    load_run: function(state, id)
+    load_run: function(state, payload)
     {
 		var lquery = {
-			id: id
+			id: payload.id
 		};
 
 		payload.http.get('../runs', {params: lquery}).then(
 		    function (response) 
 		    {
-		    	_push_run(state, id, response.data);
+		    	_push_run(state, payload.id, response.data);
 		    }
 		);
     },
-    push_run_with_wait: function(state, payload)
+    load_future: function(state, payload)
+    {
+    	var futurekey = payload.futurekey;
+    	var fut = state.futures[futurekey];
+    	
+   		var lquery = {
+   				futurekey: payload.futurekey,
+   				include_children: payload.expanded || (fut && fut.expanded)
+   			};
+
+   		if (payload.expanded)
+   		{
+	    	fut.expanded = true;
+	    	_push_future(state, payload.futurekey, fut);
+   		}
+   		
+		payload.http.get('../future', {params: lquery}).then(
+		    function (response) 
+		    {
+		    	var newfut = response.data;
+		    	newfut.expanded = payload.expanded || (fut && fut.expanded);
+		    	_push_future(state, payload.futurekey, newfut);
+		    }
+		);
+    },
+    push_future: function(state, payload)
+    {
+    	_push_future(state, payload.futurekey, payload.fut);
+    },
+    push_run: function(state, payload)
     {
     	_push_run(state, payload.id, payload.run);
     },
@@ -130,6 +162,17 @@ const store = new Vuex.Store({
 		
 		state.runids_by_test = copyTests;
 		state.runs_by_id = copyRuns;
+    },
+    contract_future: function(state, payload)
+    {
+    	var futurekey = payload.futurekey;
+    	var fut = state.futures[futurekey];
+    	
+    	if (fut)
+    	{
+    		fut.expanded = false;
+	    	_push_future(state, payload.futurekey, fut);
+    	}
     }
   }
 });
@@ -158,6 +201,19 @@ var _push_run = function(state, id, run)
 
 }
 
+var _push_future = function(state, futurekey, fut)
+{
+	var copyFutures = Object.assign({}, state.futures);
+
+	fut.loaded = true;
+	
+	copyFutures[futurekey] = fut;
+	  
+	state.futures = copyFutures;
+	
+	_monitor_futures(state, futurekey);
+}
+
 var _monitor_run = function(state, id)
 {
 	var run = state.runs_by_id[id];
@@ -173,7 +229,39 @@ var _monitor_run = function(state, id)
 				    	
 				    	if (response.data)
 				    	{
-				    		this.$store.commit("push_run_with_wait", {id: id, run: response.data});
+				    		this.$store.commit("push_run", {id: id, run: response.data});
+				    	}
+				    }
+				);
+	    	},
+			2000
+		);
+	}
+}
+
+var _monitor_futures = function(state, futurekey)
+{
+	var fut = state.futures[futurekey];
+	
+	if (fut && ["success", "failure"].indexOf(fut.status) < 0)
+	{
+		setTimeout(
+	    	function () {
+	    		var params = {
+	    			futurekey,
+	    			include_children: fut.expanded
+	    		};
+	    		
+	            app.$http.get('../future', {params}).then(
+				    function (response)
+				    {
+				    	console.log(response);
+				    	
+				    	if (response.data)
+				    	{
+				    		var newfut = response.data;
+				    		newfut.expanded = fut.expanded;
+				    		this.$store.commit("push_future", {futurekey: futurekey, fut: newfut});
 				    	}
 				    }
 				);

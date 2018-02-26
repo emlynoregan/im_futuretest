@@ -1,11 +1,11 @@
 var Test = Vue.component('test', {
-  data: function() {
-	  return {
-		  "statuses": ["underway", "pass", "fail"],
-		  "cursor": null
-	  }
-  },
-  props: [ "testname", "runs_by_test" ],
+//  data: function() {
+//	  return {
+////		  "statuses": ["underway", "pass", "fail"],
+//		  "cursor": null
+//	  }
+//  },
+  props: [ "testname" ], //, "runs_by_test" ],
   template: `
     <div>
 	    <md-button @click="navtotests">back to tests</md-button>

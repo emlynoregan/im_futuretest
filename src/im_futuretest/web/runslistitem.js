@@ -59,7 +59,11 @@ Vue.component('runs-list-item', {
 	"dodelete": function() {
 		console.log("delete");
 		this.$store.commit("delete_run", this.runid);
-	}  
+	},
+	navtofuture()
+	{
+		this.$router.push("/future/" + this.run.futurekey)
+	}
   },
   template: `
 	  <md-list-item>
@@ -85,6 +89,13 @@ Vue.component('runs-list-item', {
 				    </md-button>
 				    <md-button v-if="run_is_complete" class="md-icon-button" @click="deletedialog = true">
 				      <md-icon>delete</md-icon>
+				    </md-button>
+				</span>
+		    </div>
+		    <div class="md-layout-item md-size-10">
+				<span v-if="run_is_underway">
+				    <md-button class="md-icon-button" @click="navtofuture">
+				      <md-icon>timer</md-icon>
 				    </md-button>
 				</span>
 		    </div>
