@@ -8,7 +8,7 @@ except ImportError:
 
 dist = setup(
     name='im_futuretest',
-    version='0.1.8',
+    version='0.1.9',
     description='This package provides a pre-packaged UI for running tests based on @futures, in Google App Engine, Python standard environment projects.',
     author='Emlyn O\'Regan',
     author_email='emlynoregan@gmail.com',

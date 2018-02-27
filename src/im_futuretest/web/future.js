@@ -40,7 +40,8 @@ var Future = Vue.component('future', {
 	  							<b>Result</b>
 	  						</div>
 					  		<div class="md-layout-item md-size-90">
-	  							<pre>{{fut_result_pre}}</pre>
+	  							<pre v-if="fut.expanded">{{fut_result_pre}}</pre>
+	  							<span v-else>{{fut.result}}</span>
 	  						</div>
 					  	</div>
 			          </span>
