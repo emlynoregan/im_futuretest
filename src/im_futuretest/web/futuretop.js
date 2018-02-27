@@ -11,7 +11,7 @@ var FutureTop = Vue.component('futuretop', {
 	</div>
   `,
   created: function () {
-	  this.$emit("title", "Future");
+	  this.$emit("title", "Future Browser");
   },
   computed: {
   },

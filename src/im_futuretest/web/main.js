@@ -111,11 +111,11 @@ const store = new Vuex.Store({
     },
     push_future: function(state, payload)
     {
-    	_push_future(state, payload.futurekey, payload.fut);
+    	_push_future(state, payload.futurekey, payload.fut, payload.pollcount);
     },
     push_run: function(state, payload)
     {
-    	_push_run(state, payload.id, payload.run);
+    	_push_run(state, payload.id, payload.run, payload.pollcount);
     },
     push_run_placeholder: function(state, payload)
     {
@@ -189,7 +189,7 @@ var _push_id = function(state, id, testname)
 	}
 }
 
-var _push_run = function(state, id, run)
+var _push_run = function(state, id, run, pollcount)
 {
 	var copyRuns = Object.assign({}, state.runs_by_id);
 	
@@ -197,11 +197,11 @@ var _push_run = function(state, id, run)
 	  
 	state.runs_by_id = copyRuns;
 	
-	_monitor_run(state, id);
+	_monitor_run(state, id, pollcount);
 
 }
 
-var _push_future = function(state, futurekey, fut)
+var _push_future = function(state, futurekey, fut, pollcount)
 {
 	var copyFutures = Object.assign({}, state.futures);
 
@@ -211,12 +211,16 @@ var _push_future = function(state, futurekey, fut)
 	  
 	state.futures = copyFutures;
 	
-	_monitor_futures(state, futurekey);
+	_monitor_futures(state, futurekey, pollcount);
 }
 
-var _monitor_run = function(state, id)
+var _monitor_run = function(state, id, pollcount)
 {
 	var run = state.runs_by_id[id];
+	
+	var interval = ((pollcount || 0) +1) * 1000;
+	if (interval > 10000)
+		interval = 10000;
 	
 	if (run && ["pass", "fail"].indexOf(run.status) < 0)
 	{
@@ -229,19 +233,23 @@ var _monitor_run = function(state, id)
 				    	
 				    	if (response.data)
 				    	{
-				    		this.$store.commit("push_run", {id: id, run: response.data});
+				    		this.$store.commit("push_run", {id: id, run: response.data, pollcount: (pollcount || 0)+1});
 				    	}
 				    }
 				);
 	    	},
-			2000
+			interval
 		);
 	}
 }
 
-var _monitor_futures = function(state, futurekey)
+var _monitor_futures = function(state, futurekey, pollcount)
 {
 	var fut = state.futures[futurekey];
+	
+	var interval = ((pollcount || 0) +1) * 1000;
+	if (interval > 10000)
+		interval = 10000;
 	
 	if (fut && ["success", "failure"].indexOf(fut.status) < 0)
 	{
@@ -261,12 +269,12 @@ var _monitor_futures = function(state, futurekey)
 				    	{
 				    		var newfut = response.data;
 				    		newfut.expanded = fut.expanded;
-				    		this.$store.commit("push_future", {futurekey: futurekey, fut: newfut});
+				    		this.$store.commit("push_future", {futurekey: futurekey, fut: newfut, pollcount: (pollcount || 0)+1});
 				    	}
 				    }
 				);
 	    	},
-			2000
+			interval
 		);
 	}
 }

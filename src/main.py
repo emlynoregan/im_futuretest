@@ -69,12 +69,12 @@ def progresstest(futurekey):
 def chaintest(testfuturekey):
     def dostep(futurekey, count):
         if count < 10:
-            lonAllChildSuccess = GenerateOnAllChildSuccess(futurekey, 0, lambda x, y: x + y)
+            lonAllChildSuccess = GenerateOnAllChildSuccess(futurekey, None, lambda x, y: x or y)
             future(dostep, parentkey=futurekey, onallchildsuccessf=lonAllChildSuccess, countdown=1)(count+1)
             raise FutureReadyForResult("waiting")
         else:
-            return count
+            return {"count": count, "more": "stuff"}
 
-    lonAllChildSuccess = GenerateOnAllChildSuccess(testfuturekey, 0, lambda x, y: x + y)
+    lonAllChildSuccess = GenerateOnAllChildSuccess(testfuturekey, None, lambda x, y: x or y)
     future(dostep, parentkey=testfuturekey, onallchildsuccessf=lonAllChildSuccess, countdown=1)(0)
     raise FutureReadyForResult("waiting")

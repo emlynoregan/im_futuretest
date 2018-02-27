@@ -7,6 +7,9 @@ var Future = Vue.component('future', {
 	      <div style="width:100%">
 			<div style="width:100%" class="md-layout md-gutter">
 		  		<div class="md-layout-item md-size-5">
+				    <div>
+			  			<md-icon :class="iconclass">{{icon}}</md-icon>
+			  		</div>
 				    <div v-if="fut && fut.expanded" @click="do_contract">
 			  			<md-icon>arrow_drop_up</md-icon>
 			  		</div>
@@ -14,12 +17,7 @@ var Future = Vue.component('future', {
 			  			<md-icon>arrow_drop_down</md-icon>
 			  		</div>
 			  	</div>
-		  		<div class="md-layout-item md-size-5">
-				    <div>
-			  			<md-icon :class="iconclass">{{icon}}</md-icon>
-			  		</div>
-			  	</div>
-			    <div class="md-layout-item md-size-90">
+			    <div class="md-layout-item md-size-95">
 				    <span v-if="fut" class="md-list-item-text">
 					  <a @click="navtofuture">
 					    <span v-if="fut.name">{{fut.id}} ({{fut.name}})</span>
@@ -36,8 +34,15 @@ var Future = Vue.component('future', {
 					  	<span v-if="fut.readyforresult">(ready)</span>
 			          </span>
 					  <span>
-					  	<span v-if="fut_complete && fut.result">result: {{fut.result}}</span>
 					  	<span v-if="fut_complete && fut.exception">exception: {{fut.exception}}</span>
+						<div v-if="fut_complete && fut.result" style="width:100%" class="md-layout md-gutter">
+					  		<div class="md-layout-item md-size-10">
+	  							<b>Result</b>
+	  						</div>
+					  		<div class="md-layout-item md-size-90">
+	  							<pre>{{fut_result_pre}}</pre>
+	  						</div>
+					  	</div>
 			          </span>
 				    </span>
 		  		</div>
@@ -71,6 +76,14 @@ var Future = Vue.component('future', {
     },
     fut_complete: function() {
         return this.fut && ["success", "failure"].indexOf(this.fut.status) >= 0;
+    },
+    fut_result_pre: function() {
+        var retval = null;
+        
+        if (this.fut && this.fut.result)
+        	retval = JSON.stringify(this.fut.result, null, 4);
+        
+        return retval;
     },
 	progressmode: function() {
 		return (this.fut && this.fut.progress > 0) ? "determinate" : "indeterminate";
