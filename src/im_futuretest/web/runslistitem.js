@@ -7,7 +7,8 @@ Vue.component('runs-list-item', {
 		  		</div>
 			    <div class="md-layout-item">
 				    <span class="md-list-item-text">
-					  <span>{{run.id}} ({{run.testname}})</span>
+				      <span v-if="run.testname">{{run.testname}} ({{run.id}})</span>
+					  <span v-else>{{run.id}}</span>
 					  <span v-if="run_is_underway">
 					  	<span>started: {{run.started_desc}}</span>
 				  		<md-progress-bar v-if="!run_is_complete" :md-mode="progressmode" :md-value="run.progress"></md-progress-bar>
@@ -18,12 +19,16 @@ Vue.component('runs-list-item', {
 		  		</div>
 			    <div class="md-layout-item md-size-5">
 					<span v-if="run_is_underway">
-					    <md-button v-if="!run_is_complete" class="md-icon-button" @click="canceldialog = true">
-					      <md-icon>cancel</md-icon>
-					    </md-button>
-					    <md-button v-if="run_is_complete" class="md-icon-button" @click="deletedialog = true">
-					      <md-icon>delete</md-icon>
-					    </md-button>
+						<div v-if="!run_is_complete">
+						    <md-button class="md-icon-button" @click="canceldialog = true">
+						      <md-icon>cancel</md-icon>
+						    </md-button>
+						</div>
+						<div>
+						    <md-button class="md-icon-button" @click="deletedialog = true">
+						      <md-icon>delete</md-icon>
+						    </md-button>
+						</div>
 					</span>
 			    </div>
 			    <div class="md-layout-item md-size-5">

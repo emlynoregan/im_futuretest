@@ -1,5 +1,5 @@
 from google.appengine.ext import ndb
-from im_future import future
+from im_future import future, GetFutureAndCheckReady
 import uuid
 from im_debouncedtask import debouncedtask
 import datetime
@@ -59,37 +59,38 @@ class TestRun(ndb.model.Model):
             )
              
         def onsuccess(futurekey):
-            futureobj = futurekey.get() if futurekey else None
-            if futureobj:
-                lrun = lrunKey.get()
-                
-                if lrun and lrun.status in [_TEST_RUN_STATUS_NOT_READY, _TEST_RUN_STATUS_READY]:
-                    lrun.status = _TEST_RUN_STATUS_PASS
-                    lrun.progress = 100
-                    lresult = futureobj.get_result()
-                    if lresult:
-                        lrun.final_message = str(lresult)
-                    lrun.final_runtime_usec = calc_final_runtime_usec(lrun.started)
-                    lrun.put()
+            futureobj = GetFutureAndCheckReady(futurekey)
+
+            lrun = lrunKey.get()
+            
+            if lrun and lrun.status in [_TEST_RUN_STATUS_NOT_READY, _TEST_RUN_STATUS_READY]:
+                lrun.status = _TEST_RUN_STATUS_PASS
+                lrun.progress = 100
+                lresult = futureobj.get_result()
+                if lresult:
+                    lrun.final_message = str(lresult)
+                lrun.final_runtime_usec = calc_final_runtime_usec(lrun.started)
+                lrun.put()
         
         def onfailure(futurekey):
-            futureobj = futurekey.get() if futurekey else None
-            if futureobj:
-                lrun = lrunKey.get()
-                
-                if lrun and lrun.status in [_TEST_RUN_STATUS_NOT_READY, _TEST_RUN_STATUS_READY]:
-                    lrun.status = _TEST_RUN_STATUS_FAIL
-                    lrun.progress = 100
-                    try:
-                        futureobj.get_result()
-                    except Exception, ex:
-                        lrun.final_message = str(ex)
-                    lrun.final_runtime_usec = calc_final_runtime_usec(lrun.started)
-                    lrun.put()
+            futureobj = GetFutureAndCheckReady(futurekey)
+
+            lrun = lrunKey.get()
+            
+            if lrun and lrun.status in [_TEST_RUN_STATUS_NOT_READY, _TEST_RUN_STATUS_READY]:
+                lrun.status = _TEST_RUN_STATUS_FAIL
+                lrun.progress = 100
+                try:
+                    futureobj.get_result()
+                except Exception, ex:
+                    lrun.final_message = str(ex)
+                lrun.final_runtime_usec = calc_final_runtime_usec(lrun.started)
+                lrun.put()
 
         @debouncedtask(**ltaskkwargs)
         def onprogress(futurekey):
-            futureobj = futurekey.get() if futurekey else None
+            futureobj = GetFutureAndCheckReady(futurekey)
+
             if futureobj:
                 lrun = lrunKey.get()
                 if lrun and lrun.status in [_TEST_RUN_STATUS_NOT_READY, _TEST_RUN_STATUS_READY]:
