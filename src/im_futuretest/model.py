@@ -58,6 +58,7 @@ class TestRun(ndb.model.Model):
                 (lnow - aStarted).total_seconds() * 1000000
             )
              
+        @ndb.transactional(xg=True)
         def onsuccess(futurekey):
             futureobj = GetFutureAndCheckReady(futurekey)
 
@@ -72,6 +73,7 @@ class TestRun(ndb.model.Model):
                 lrun.final_runtime_usec = calc_final_runtime_usec(lrun.started)
                 lrun.put()
         
+        @ndb.transactional(xg=True)
         def onfailure(futurekey):
             futureobj = GetFutureAndCheckReady(futurekey)
 
@@ -88,6 +90,7 @@ class TestRun(ndb.model.Model):
                 lrun.put()
 
         @debouncedtask(**ltaskkwargs)
+        @ndb.transactional(xg=True)
         def onprogress(futurekey):
             futureobj = GetFutureAndCheckReady(futurekey)
 
