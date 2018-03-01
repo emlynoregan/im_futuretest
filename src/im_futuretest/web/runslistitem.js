@@ -11,9 +11,9 @@ Vue.component('runs-list-item', {
 					  <span v-else>{{run.id}}</span>
 					  <span v-if="run_is_underway">
 					  	<span>started: {{run.started_desc}}</span>
-				  		<md-progress-bar v-if="!run_is_complete" :md-mode="progressmode" :md-value="run.progress"></md-progress-bar>
+				  		<md-progress-bar v-if="!run_is_complete" :md-mode="progressmode" :md-value="progress"></md-progress-bar>
 					  	<span v-if="run.final_runtime_usec">completed: {{run.final_runtime_usec / 1000000}} sec</span>
-					  	<span class="md-list-item-text" v-if="run.final_message">message: {{run.final_message}}</span>
+					  	<span class="md-list-item-text" v-if="run.final_message">{{run_result}}</span>
 			          </span>
 				    </span>
 		  		</div>
@@ -104,7 +104,29 @@ Vue.component('runs-list-item', {
 	},
 	progressmode: function() {
 		return (this.run && this.run.progress > 0) ? "determinate" : "indeterminate";
-	}
+	},
+	progress: function() {
+		var retval = 0;
+		
+		if (this.run && this.run.progress)
+		{
+			retval = this.run.progress * 100 / (this.run.weight || 100);
+		}
+		
+		return retval;
+	},
+    run_result: function() {
+        var retval = null;
+        
+        if (this.run && this.run.final_message)
+        {
+        	retval = this.run.final_message;
+        	if (retval.length > 60)
+        		retval = retval.slice(0, 60) + "...";
+        };
+        
+        return "message: " + retval;
+    }
   },
   methods: 
   {

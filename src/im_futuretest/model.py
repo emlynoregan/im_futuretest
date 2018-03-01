@@ -4,6 +4,7 @@ import uuid
 from im_debouncedtask import debouncedtask
 import datetime
 from im_util import datetime_to_unixtimestampusec
+import logging
 
 _TEST_RUN_STATUSES = ["constructing", "running", "pass", "fail"]
 _TEST_RUN_STATUS_NOT_READY = _TEST_RUN_STATUSES[0]
@@ -18,7 +19,8 @@ class TestRun(ndb.model.Model):
     started = ndb.DateTimeProperty()
     status = ndb.StringProperty()
     progress = ndb.FloatProperty()
-
+    weight = ndb.IntegerProperty()
+    
     final_runtime_usec = ndb.IntegerProperty()
     final_message = ndb.StringProperty()
     
@@ -40,15 +42,20 @@ class TestRun(ndb.model.Model):
     def go(cls, testDef):
         lrunKey = cls.construct_key()
         
+        lweight = testDef.get("weight", 100)
+        
+        logging.warning("weight: %s" % lweight)
+        
         lrun = TestRun(
             key = lrunKey,
             testname = testDef.get("name"),
             status = _TEST_RUN_STATUS_NOT_READY,
             progress = 0,
-            
+            weight = lweight
         )
 
-        ltaskkwargs = testDef.get("taskkwargs") or {}
+        ltaskkwargs = dict(testDef.get("taskkwargs") or {})
+        
         f = testDef.get("f")
 
         def calc_final_runtime_usec(aStarted):
@@ -105,7 +112,7 @@ class TestRun(ndb.model.Model):
             onsuccessf = onsuccess, 
             onfailuref = onfailure, 
             onprogressf = onprogress, 
-            weight = 100,
+            weight = lweight,
             **ltaskkwargs
         )()
 
@@ -133,6 +140,7 @@ class TestRun(ndb.model.Model):
             "started": datetime_to_unixtimestampusec(self.started),
             "started_desc": str(self.started),
             "progress": self.progress,
+            "weight": self.weight or 100,
             "futurekey": self.futurekey.urlsafe() if self.futurekey else None
         }
 

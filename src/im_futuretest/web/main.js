@@ -173,6 +173,16 @@ const store = new Vuex.Store({
     		fut.expanded = false;
 	    	_push_future(state, payload.futurekey, fut);
     	}
+    },
+    toggle_resultexpanded: function(state, futurekey)
+    {
+    	var fut = state.futures[futurekey];
+    	
+    	if (fut)
+    	{
+    		fut.resultexpanded = !fut.resultexpanded;
+	    	_push_future(state, futurekey, fut);
+	    }
     }
   }
 });
@@ -204,11 +214,14 @@ var _push_run = function(state, id, run, pollcount)
 var _push_future = function(state, futurekey, fut, pollcount)
 {
 	var copyFutures = Object.assign({}, state.futures);
-
-	fut.loaded = true;
 	
+	var oldfut = copyFutures[futurekey];
+
+	if (oldfut)
+		fut.expanded = oldfut.expanded;
+
 	copyFutures[futurekey] = fut;
-	  
+		  
 	state.futures = copyFutures;
 	
 	_monitor_futures(state, futurekey, pollcount);
@@ -268,7 +281,6 @@ var _monitor_futures = function(state, futurekey, pollcount)
 				    	if (response.data)
 				    	{
 				    		var newfut = response.data;
-				    		newfut.expanded = fut.expanded;
 				    		this.$store.commit("push_future", {futurekey: futurekey, fut: newfut, pollcount: (pollcount || 0)+1});
 				    	}
 				    }

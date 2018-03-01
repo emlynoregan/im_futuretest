@@ -27,7 +27,7 @@ var Future = Vue.component('future', {
 					  	<span>stored: {{fut.stored}}</span>
 					  	<span>updated: {{fut.updated}}</span>
 			          </span>
-				  	  <md-progress-bar v-if="!fut_complete" :md-mode="progressmode" :md-value="fut.progress"></md-progress-bar>
+				  	  <md-progress-bar v-if="!fut_complete" :md-mode="progressmode" :md-value="progress"></md-progress-bar>
 					  <span>
 					  	<span>runtime: {{fut.runtimesec}} sec</span>
 					  	<span v-if="fut.initialised">(init)</span>
@@ -39,9 +39,9 @@ var Future = Vue.component('future', {
 					  		<div class="md-layout-item md-size-10">
 	  							<b>Result</b>
 	  						</div>
-					  		<div class="md-layout-item md-size-90">
-	  							<pre v-if="fut.expanded">{{fut_result_pre}}</pre>
-	  							<span v-else>{{fut.result}}</span>
+					  		<div class="md-layout-item md-size-90" @click="toggleresult">
+	  							<pre v-if="fut.resultexpanded">{{fut_result_pre}}</pre>
+	  							<span v-else>{{fut_result}}</span>
 	  						</div>
 					  	</div>
 			          </span>
@@ -77,6 +77,18 @@ var Future = Vue.component('future', {
     },
     fut_complete: function() {
         return this.fut && ["success", "failure"].indexOf(this.fut.status) >= 0;
+    },
+    fut_result: function() {
+        var retval = null;
+        
+        if (this.fut && this.fut.result)
+        {
+        	retval = JSON.stringify(this.fut.result);
+        	if (retval.length > 60)
+        		retval = retval.slice(0, 60) + "...";
+        }
+        
+        return retval;
     },
     fut_result_pre: function() {
         var retval = null;
@@ -146,6 +158,16 @@ var Future = Vue.component('future', {
 			return null;
 		}
 	},
+	progress: function() {
+		var retval = 0;
+		
+		if (this.fut && this.fut.progress)
+		{
+			retval = this.fut.progress * 100 / (this.fut.weight || 100);
+		}
+		
+		return retval;
+	}
   },
   methods: {
 	  do_expand: function() {
@@ -153,6 +175,9 @@ var Future = Vue.component('future', {
 	  },
 	  do_contract: function() {
 		this.$store.commit("contract_future", { futurekey: this.futurekey, http: this.$http });
+	  },
+	  toggleresult: function() {
+		this.$store.commit("toggle_resultexpanded", this.futurekey);
 	  },
 	  navtofuture()
 	  {

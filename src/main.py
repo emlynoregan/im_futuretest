@@ -51,12 +51,12 @@ def slowtestusingtask(futurekey):
     SetResult()
     raise FutureReadyForResult("waiting")
 
-@register_test(description="slow with progress", tags=["task"])
+@register_test(description="slow with progress", tags=["task"], weight = 20)#x
 def progresstest(futurekey):
     @task(countdown=1)
     def Tick(aProgress):
         fut = GetFutureAndCheckReady(futurekey)
-        fut.set_localprogress(aProgress * 5)
+        fut.set_localprogress(aProgress)
         if aProgress < 20:
             Tick(aProgress+1)
         else:

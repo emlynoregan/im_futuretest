@@ -2,7 +2,9 @@ var FutureTop = Vue.component('futuretop', {
   props: [ "futurekey" ],
   template: `
     <div>
+<!--
 	    <md-button @click="navtotests">back to tests</md-button>
+-->
 	    <div>
 			<md-list>
 			  <future :futurekey="futurekey" :key="futurekey"/>

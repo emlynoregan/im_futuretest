@@ -20,9 +20,9 @@ def _to_json(testrun):
     return testrun.to_json() if testrun else None
     
 
-def register_test(f=None, name=None, description=None, tags=[], **taskkwargs):
+def register_test(f=None, name=None, description=None, tags=[], weight=100, **taskkwargs):
     if not f:
-        return functools.partial(register_test, name=name, description=description, tags=tags, **taskkwargs)
+        return functools.partial(register_test, name=name, description=description, tags=tags, weight=weight, **taskkwargs)
 
     global _tests
 
@@ -36,6 +36,7 @@ def register_test(f=None, name=None, description=None, tags=[], **taskkwargs):
         "name": lname,
         "description": description,
         "tags": tags,
+        "weight": weight,
         "taskkwargs": taskkwargs
     }
     
