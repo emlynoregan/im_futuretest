@@ -1,13 +1,13 @@
 import functools
 from model import TestRun
-import logging
+from im_util import logdebug
 from google.appengine.ext import ndb
 import os
 
 _tests = {}
         
 def _cleantest(test):
-    logging.info(test)
+    logdebug(test)
     retval = dict(test) if test else None
     if retval:
         if "f" in retval:
@@ -40,7 +40,7 @@ def register_test(f=None, name=None, description=None, tags=[], weight=100, **ta
         "taskkwargs": taskkwargs
     }
     
-    logging.info(_tests)
+    logdebug(_tests)
     
     return f
 
