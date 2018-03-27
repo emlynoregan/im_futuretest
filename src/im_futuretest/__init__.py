@@ -57,7 +57,7 @@ def run_test(testname):
 def get_test_by_name(name):
     global _tests
     
-    logging.info("name: %s" % name)
+    logdebug("name: %s" % name)
     retval = _cleantest(_tests.get(name))
     
     return retval
